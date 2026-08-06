@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>FLIP LOG — TCG Portfolio Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1210;
+    --surface:#171b18;
+    --surface2:#1e2420;
+    --line:#2a322c;
+    --ink:#eae8e0;
+    --ink-dim:#939a8f;
+    --ink-faint:#5a635c;
+    --gold:#c9a15a;
+    --gold-dim:#96794a;
+    --profit:#5fbf7a;
+    --profit-dim:#3d7d50;
+    --loss:#d1685a;
+    --loss-dim:#96473c;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    background:
+      radial-gradient(900px 500px at 12% -10%, rgba(201,161,90,0.06), transparent 60%),
+      radial-gradient(700px 400px at 100% 0%, rgba(95,191,122,0.05), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  ::selection{background:var(--gold); color:#1a1305;}
+  input, select, button, textarea{font-family:inherit;}
+
+  header{
+    max-width:1080px;
+    margin:0 auto;
+    padding:40px 20px 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--gold);
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:var(--profit); box-shadow:0 0 8px var(--profit);
+  }
+  h1{
+    font-family:'Newsreader',serif;
+    font-size:clamp(32px,6vw,48px);
+    font-weight:600;
+    margin-top:10px;
+    letter-spacing:-0.01em;
+    line-height:1.05;
+  }
+  h1 em{ font-style:italic; color:var(--gold); font-weight:500; }
+  .sub{
+    color:var(--ink-dim);
+    font-size:14.5px;
+    margin-top:10px;
+    max-width:600px;
+    line-height:1.6;
+  }
+  .storage-note{
+    margin-top:16px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:3px solid var(--gold-dim);
+    border-radius:0 8px 8px 0;
+    padding:12px 15px;
+    font-size:12px;
+    color:var(--ink-dim);
+    line-height:1.6;
+    max-width:680px;
+  }
+  .storage-note b{ color:var(--gold); }
+
+  main{ max-width:1080px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- Summary statement ---------- */
+  .statement{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:28px;
+  }
+  @media(max-width:700px){ .statement{ grid-template-columns:repeat(2,1fr); } }
+  .stat-cell{
+    background:var(--surface);
+    padding:18px 16px;
+  }
+  .stat-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .stat-value{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:24px;
+    font-weight:600;
+    margin-top:6px;
+    font-variant-numeric:tabular-nums;
+  }
+  .stat-value.profit{ color:var(--profit); }
+  .stat-value.loss{ color:var(--loss); }
+  .stat-sub{ font-size:11px; color:var(--ink-faint); margin-top:3px; }
+
+  /* ---------- Add transaction form ---------- */
+  .ledger-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-top:24px;
+    overflow:hidden;
+  }
+  .ledger-head{
+    padding:16px 18px;
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer;
+    user-select:none;
+  }
+  .ledger-title{
+    font-family:'Newsreader',serif;
+    font-size:18px;
+    font-weight:600;
+    display:flex; align-items:center; gap:8px;
+  }
+  .ledger-toggle{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--gold);
+    border:1px solid var(--gold-dim);
+    padding:5px 12px;
+    border-radius:20px;
+  }
+  .ledger-body{ padding:18px; }
+  .ledger-body.collapsed{ display:none; }
+  .form-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr 1.4fr;
+    gap:12px;
+  }
+  .form-grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:12px;
+    margin-top:12px;
+  }
+  @media(max-width:700px){ .form-grid, .form-grid2{ grid-template-columns:1fr 1fr; } }
+  .field-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    display:block;
+    margin-bottom:6px;
+  }
+  .field-input{
+    width:100%;
+    background:var(--surface2);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:10px 12px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+  }
+  .field-input.mono{ font-family:'IBM Plex Mono',monospace; }
+  .field-input:focus{ outline:none; border-color:var(--gold-dim); }
+  .field-input::placeholder{ color:var(--ink-faint); }
+  .form-actions{
+    display:flex; align-items:center; gap:10px;
+    margin-top:16px;
+  }
+  .btn-primary{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    font-weight:600;
+    background:var(--gold);
+    color:#1a1305;
+    border:none;
+    padding:11px 20px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .btn-primary:hover{ background:#dcb46c; }
+  .btn-secondary{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    background:var(--surface2);
+    color:var(--ink-dim);
+    border:1px solid var(--line);
+    padding:10px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .btn-secondary:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .form-hint{ font-size:11.5px; color:var(--ink-faint); margin-top:4px; }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    margin-top:26px; margin-bottom:16px;
+  }
+  .search-wrap{ position:relative; flex:1; min-width:180px; }
+  .search-wrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink-faint); }
+  .search-input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 12px 9px 34px;
+    color:var(--ink);
+    font-size:13.5px;
+  }
+  .chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:8px 13px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink-dim);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .chip.active{ background:var(--gold); border-color:var(--gold); color:#1a1305; font-weight:600; }
+  .chip.active[data-filter="holding"]{ background:var(--ink-dim); border-color:var(--ink-dim); color:#0f1210; }
+  .chip.active[data-filter="profit"]{ background:var(--profit); border-color:var(--profit); color:#0a1f10; }
+  .chip.active[data-filter="loss"]{ background:var(--loss); border-color:var(--loss); color:#2a0f0b; }
+  .export-btns{ display:flex; gap:6px; margin-left:auto; }
+  .icon-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .icon-btn:hover{ border-color:var(--gold-dim); color:var(--gold); }
+
+  /* ---------- Transaction rows ---------- */
+  .tx-list{ display:flex; flex-direction:column; gap:10px; }
+  .tx-row{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    position:relative;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:12px;
+    align-items:start;
+  }
+  .tx-main{ min-width:0; }
+  .tx-name{ font-family:'Newsreader',serif; font-size:17px; font-weight:600; }
+  .tx-meta{ font-size:12px; color:var(--ink-faint); margin-top:3px; }
+  .tx-prices{
+    display:flex; gap:20px; margin-top:10px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .tx-price-block .lbl{ font-size:9px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; }
+  .tx-price-block .val{ font-size:15px; font-weight:600; margin-top:2px; }
+  .tx-dates{ font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:'IBM Plex Mono',monospace; }
+  .status-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:20px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    display:inline-block;
+    margin-top:8px;
+  }
+  .status-pill.holding{ background:rgba(147,154,143,0.15); color:var(--ink-dim); border:1px solid var(--line); }
+
+  /* ---------- Stamp signature element ---------- */
+  .stamp{
+    position:absolute;
+    top:14px; right:16px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.04em;
+    padding:8px 14px;
+    border:2.5px solid;
+    border-radius:6px;
+    transform:rotate(4deg);
+    text-transform:uppercase;
+    white-space:nowrap;
+    opacity:0.92;
+  }
+  .stamp.profit{ color:var(--profit); border-color:var(--profit); }
+  .stamp.loss{ color:var(--loss); border-color:var(--loss); transform:rotate(-3deg); }
+  .stamp::before{
+    content:'';
+    position:absolute; inset:2px;
+    border:1px solid currentColor;
+    border-radius:4px;
+    opacity:0.4;
+  }
+  .tx-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .tx-actions button{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    background:var(--surface2);
+    color:var(--ink-faint);
+    border:1px solid var(--line);
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .tx-actions button:hover{ color:var(--ink); border-color:var(--gold-dim); }
+  .tx-actions button.danger:hover{ color:var(--loss); border-color:var(--loss-dim); }
+
+  .empty-state{
+    text-align:center; padding:60px 20px;
+    color:var(--ink-faint); font-size:13px;
+  }
+  .empty-state .big{ font-family:'Newsreader',serif; font-size:20px; color:var(--ink-dim); margin-bottom:8px; font-style:italic; }
+
+  footer{
+    max-width:1080px; margin:50px auto 0; padding:20px;
+    border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); line-height:1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Flip Log · personal P&amp;L ledger</div>
+  <h1>Every flip, <em>booked</em>.</h1>
+  <p class="sub">Log what you paid, what you sold it for, and watch your real capital and P&amp;L add up — no market data, no opinions, just your own numbers.</p>
+  <div class="storage-note">
+    <b>Where this data lives:</b> everything you enter is saved in this browser only (localStorage), on this device. It is not synced anywhere and clearing your browser data will erase it. Use <b>Export</b> regularly to save a backup file you can re-<b>Import</b> later or on another device.
+  </div>
+</header>
+
+<main>
+
+  <div class="statement" id="statementGrid"></div>
+
+  <div class="ledger-card">
+    <div class="ledger-head" id="ledgerHead">
+      <div class="ledger-title">📗 Log a transaction</div>
+      <div class="ledger-toggle" id="ledgerToggle">+ New entry</div>
+    </div>
+    <div class="ledger-body collapsed" id="ledgerBody">
+      <div class="form-grid">
+        <div>
+          <label class="field-label">Card name</label>
+          <input class="field-input" id="fName" placeholder="e.g. Umbreon ex">
+        </div>
+        <div>
+          <label class="field-label">Number</label>
+          <input class="field-input mono" id="fNum" placeholder="161/131">
+        </div>
+        <div>
+          <label class="field-label">Set</label>
+          <input class="field-input" id="fSet" placeholder="Prismatic Evolutions">
+        </div>
+      </div>
+      <div class="form-grid2">
+        <div>
+          <label class="field-label">Buy price</label>
+          <input class="field-input mono" id="fBuy" type="number" step="0.01" placeholder="0.00">
+        </div>
+        <div>
+          <label class="field-label">Buy date</label>
+          <input class="field-input mono" id="fBuyDate" type="date">
+        </div>
+        <div>
+          <label class="field-label">Sell price <span style="color:var(--ink-faint);">(optional)</span></label>
+          <input class="field-input mono" id="fSell" type="number" step="0.01" placeholder="0.00">
+        </div>
+        <div>
+          <label class="field-label">Sell date <span style="color:var(--ink-faint);">(optional)</span></label>
+          <input class="field-input mono" id="fSellDate" type="date">
+        </div>
+      </div>
+      <p class="form-hint">Leave sell price blank if you're still holding — it'll show as "Holding" until you close it out.</p>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="saveTransaction()">Save entry</button>
+        <button class="btn-secondary" onclick="resetForm()">Clear</button>
+        <span id="editingNote" style="font-size:11.5px; color:var(--gold); display:none;">Editing existing entry — saving will update it.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search card or set…" oninput="render()">
+    </div>
+    <button class="chip active" data-filter="all" onclick="setFilter('all', this)">All</button>
+    <button class="chip" data-filter="holding" onclick="setFilter('holding', this)">Holding</button>
+    <button class="chip" data-filter="profit" onclick="setFilter('profit', this)">Profit</button>
+    <button class="chip" data-filter="loss" onclick="setFilter('loss', this)">Loss</button>
+    <div class="export-btns">
+      <button class="icon-btn" onclick="exportData()">⬇ Export</button>
+      <button class="icon-btn" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importData(event)">
+    </div>
+  </div>
+
+  <div class="tx-list" id="txList"></div>
+
+</main>
+
+<footer>
+  FLIP LOG — a personal calculator, not financial advice. All figures are exactly what you enter; nothing here is verified against live market prices. Data stored locally in your browser via localStorage.
+</footer>
+
+<script>
+  const STORAGE_KEY = 'fliplog_transactions_v1';
+  let activeFilter = 'all';
+  let editingId = null;
+
+  function loadTx(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+  function saveTx(list){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+  function fmtUSD(n){
+    const sign = n < 0 ? '-' : '';
+    return sign + '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function toggleLedger(){
+    const body = document.getElementById('ledgerBody');
+    const toggle = document.getElementById('ledgerToggle');
+    const collapsed = body.classList.toggle('collapsed');
+    toggle.textContent = collapsed ? '+ New entry' : '– Collapse';
+  }
+  document.getElementById('ledgerHead').addEventListener('click', toggleLedger);
+
+  function resetForm(){
+    ['fName','fNum','fSet','fBuy','fBuyDate','fSell','fSellDate'].forEach(id => document.getElementById(id).value = '');
+    editingId = null;
+    document.getElementById('editingNote').style.display = 'none';
+  }
+
+  function saveTransaction(){
+    const name = document.getElementById('fName').value.trim();
+    const num = document.getElementById('fNum').value.trim();
+    const set = document.getElementById('fSet').value.trim();
+    const buy = parseFloat(document.getElementById('fBuy').value);
+    const buyDate = document.getElementById('fBuyDate').value;
+    const sellRaw = document.getElementById('fSell').value;
+    const sell = sellRaw === '' ? null : parseFloat(sellRaw);
+    const sellDate = document.getElementById('fSellDate').value;
+
+    if(!name || isNaN(buy)){
+      alert('Card name and buy price are required.');
+      return;
+    }
+
+    const list = loadTx();
+    const entry = { id: editingId || (Date.now() + '-' + Math.random().toString(36).slice(2,7)), name, num, set, buy, buyDate, sell, sellDate };
+
+    if(editingId){
+      const idx = list.findIndex(t => t.id === editingId);
+      if(idx !== -1) list[idx] = entry;
+    } else {
+      list.push(entry);
+    }
+    saveTx(list);
+    resetForm();
+    document.getElementById('ledgerBody').classList.add('collapsed');
+    document.getElementById('ledgerToggle').textContent = '+ New entry';
+    render();
+  }
+
+  function editTransaction(id){
+    const list = loadTx();
+    const t = list.find(x => x.id === id);
+    if(!t) return;
+    document.getElementById('fName').value = t.name;
+    document.getElementById('fNum').value = t.num || '';
+    document.getElementById('fSet').value = t.set || '';
+    document.getElementById('fBuy').value = t.buy;
+    document.getElementById('fBuyDate').value = t.buyDate || '';
+    document.getElementById('fSell').value = t.sell === null || t.sell === undefined ? '' : t.sell;
+    document.getElementById('fSellDate').value = t.sellDate || '';
+    editingId = id;
+    document.getElementById('editingNote').style.display = 'inline';
+    document.getElementById('ledgerBody').classList.remove('collapsed');
+    document.getElementById('ledgerToggle').textContent = '– Collapse';
+    window.scrollTo({top: document.querySelector('.ledger-card').offsetTop - 20, behavior:'smooth'});
+  }
+
+  function deleteTransaction(id){
+    if(!confirm('Delete this entry? This cannot be undone.')) return;
+    const list = loadTx().filter(t => t.id !== id);
+    saveTx(list);
+    render();
+  }
+
+  function setFilter(val, btn){
+    activeFilter = val;
+    document.querySelectorAll('.chip[data-filter]').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  function exportData(){
+    const list = loadTx();
+    const blob = new Blob([JSON.stringify(list, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fliplog-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      try {
+        const imported = JSON.parse(e.target.result);
+        if(!Array.isArray(imported)) throw new Error('not an array');
+        const existing = loadTx();
+        const existingIds = new Set(existing.map(t => t.id));
+        const merged = existing.concat(imported.filter(t => !existingIds.has(t.id)));
+        saveTx(merged);
+        render();
+        alert('Imported ' + imported.length + ' entries (duplicates skipped).');
+      } catch(err) {
+        alert('Could not read that file — make sure it is a Flip Log export.');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function computeSummary(list){
+    let capitalDeployed = 0, realizedPL = 0, wins = 0, losses = 0, holdingCount = 0, holdingCapital = 0;
+    list.forEach(t => {
+      capitalDeployed += t.buy;
+      if(t.sell !== null && t.sell !== undefined && !isNaN(t.sell)){
+        const pl = t.sell - t.buy;
+        realizedPL += pl;
+        if(pl >= 0) wins++; else losses++;
+      } else {
+        holdingCount++;
+        holdingCapital += t.buy;
+      }
+    });
+    const closedCount = wins + losses;
+    const winRate = closedCount > 0 ? Math.round((wins / closedCount) * 100) : null;
+    return { capitalDeployed, realizedPL, winRate, holdingCount, holdingCapital, closedCount };
+  }
+
+  function renderStatement(list){
+    const s = computeSummary(list);
+    const plClass = s.realizedPL > 0 ? 'profit' : (s.realizedPL < 0 ? 'loss' : '');
+    document.getElementById('statementGrid').innerHTML = `
+      <div class="stat-cell">
+        <div class="stat-label">Total Capital Deployed</div>
+        <div class="stat-value">${fmtUSD(s.capitalDeployed)}</div>
+        <div class="stat-sub">${list.length} total entries</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Realized P&amp;L</div>
+        <div class="stat-value ${plClass}">${fmtUSD(s.realizedPL)}</div>
+        <div class="stat-sub">${s.closedCount} closed trades</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value">${s.winRate === null ? '—' : s.winRate + '%'}</div>
+        <div class="stat-sub">${s.winRate === null ? 'no closed trades yet' : 'of closed trades'}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Currently Holding</div>
+        <div class="stat-value">${s.holdingCount}</div>
+        <div class="stat-sub">${fmtUSD(s.holdingCapital)} tied up</div>
+      </div>
+    `;
+  }
+
+  function txCardHTML(t){
+    const hasSell = t.sell !== null && t.sell !== undefined && !isNaN(t.sell);
+    const pl = hasSell ? t.sell - t.buy : null;
+    const stampHTML = hasSell
+      ? `<div class="stamp ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : '-'}${fmtUSD(Math.abs(pl)).replace('$','$')} ${pl >= 0 ? 'PROFIT' : 'LOSS'}</div>`
+      : '';
+    const metaParts = [t.set, t.num].filter(Boolean).join(' · ');
+    return `
+      <div class="tx-row">
+        ${stampHTML}
+        <div class="tx-main">
+          <div class="tx-name">${escapeHTML(t.name)}</div>
+          ${metaParts ? `<div class="tx-meta">${escapeHTML(metaParts)}</div>` : ''}
+          <div class="tx-prices">
+            <div class="tx-price-block"><div class="lbl">Bought</div><div class="val">${fmtUSD(t.buy)}</div></div>
+            ${hasSell ? `<div class="tx-price-block"><div class="lbl">Sold</div><div class="val">${fmtUSD(t.sell)}</div></div>` : ''}
+          </div>
+          ${!hasSell ? '<div class="status-pill holding">Holding</div>' : ''}
+          <div class="tx-dates">${t.buyDate ? 'Bought ' + t.buyDate : ''}${hasSell && t.sellDate ? '  ·  Sold ' + t.sellDate : ''}</div>
+        </div>
+        <div class="tx-actions">
+          <button onclick="editTransaction('${t.id}')">Edit</button>
+          <button class="danger" onclick="deleteTransaction('${t.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHTML(s){
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function render(){
+    const list = loadTx();
+    renderStatement(list);
+
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    let filtered = list.filter(t => {
+      const hasSell = t.sell !== null && t.sell !== undefined && !isNaN(t.sell);
+      const pl = hasSell ? t.sell - t.buy : null;
+      if(activeFilter === 'holding' && hasSell) return false;
+      if(activeFilter === 'profit' && (!hasSell || pl < 0)) return false;
+      if(activeFilter === 'loss' && (!hasSell || pl >= 0)) return false;
+      if(q && !((t.name+' '+(t.set||'')).toLowerCase().includes(q))) return false;
+      return true;
+    });
+
+    filtered = filtered.slice().reverse(); // newest first
+
+    const listEl = document.getElementById('txList');
+    if(filtered.length === 0){
+      listEl.innerHTML = `<div class="empty-state"><div class="big">${list.length === 0 ? "Your ledger is empty" : "No entries match this filter"}</div>${list.length === 0 ? "Log your first buy above to start tracking." : "Try a different filter or search term."}</div>`;
+      return;
+    }
+    listEl.innerHTML = filtered.map(txCardHTML).join('');
+  }
+
+  render();
+</script>
+
+</body>
+</html>
