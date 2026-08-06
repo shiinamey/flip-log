@@ -8,19 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f1210;
-    --surface:#171b18;
-    --surface2:#1e2420;
-    --line:#2a322c;
-    --ink:#eae8e0;
-    --ink-dim:#939a8f;
-    --ink-faint:#5a635c;
-    --gold:#c9a15a;
-    --gold-dim:#96794a;
-    --profit:#5fbf7a;
-    --profit-dim:#3d7d50;
-    --loss:#d1685a;
-    --loss-dim:#96473c;
+    --bg:#0f1210; --surface:#171b18; --surface2:#1e2420; --surface3:#242b26; --line:#2a322c;
+    --ink:#eae8e0; --ink-dim:#939a8f; --ink-faint:#5a635c;
+    --gold:#c9a15a; --gold-dim:#96794a;
+    --profit:#5fbf7a; --profit-dim:#3d7d50;
+    --loss:#d1685a; --loss-dim:#96473c;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{-webkit-text-size-adjust:100%;}
@@ -29,324 +21,189 @@
       radial-gradient(900px 500px at 12% -10%, rgba(201,161,90,0.06), transparent 60%),
       radial-gradient(700px 400px at 100% 0%, rgba(95,191,122,0.05), transparent 55%),
       var(--bg);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-    padding-bottom:60px;
+    color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh; padding-bottom:60px;
   }
   ::selection{background:var(--gold); color:#1a1305;}
   input, select, button, textarea{font-family:inherit;}
+  *{transition:background-color .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease, transform .18s ease;}
 
-  header{
-    max-width:1080px;
-    margin:0 auto;
-    padding:40px 20px 20px;
-    border-bottom:1px solid var(--line);
-  }
+  header{ max-width:1080px; margin:0 auto; padding:40px 20px 20px; border-bottom:1px solid var(--line); }
+  .header-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
   .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    color:var(--gold);
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    display:flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold);
+    letter-spacing:0.14em; text-transform:uppercase; display:flex; align-items:center; gap:8px;
   }
-  .eyebrow::before{
-    content:''; width:6px; height:6px; border-radius:50%;
-    background:var(--profit); box-shadow:0 0 8px var(--profit);
-  }
-  h1{
-    font-family:'Newsreader',serif;
-    font-size:clamp(32px,6vw,48px);
-    font-weight:600;
-    margin-top:10px;
-    letter-spacing:-0.01em;
-    line-height:1.05;
-  }
+  .eyebrow::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--profit); box-shadow:0 0 8px var(--profit); }
+  h1{ font-family:'Newsreader',serif; font-size:clamp(32px,6vw,48px); font-weight:600; margin-top:10px; letter-spacing:-0.01em; line-height:1.05; }
   h1 em{ font-style:italic; color:var(--gold); font-weight:500; }
-  .sub{
-    color:var(--ink-dim);
-    font-size:14.5px;
-    margin-top:10px;
-    max-width:600px;
-    line-height:1.6;
-  }
+  .sub{ color:var(--ink-dim); font-size:14.5px; margin-top:10px; max-width:600px; line-height:1.6; }
   .storage-note{
-    margin-top:16px;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-left:3px solid var(--gold-dim);
-    border-radius:0 8px 8px 0;
-    padding:12px 15px;
-    font-size:12px;
-    color:var(--ink-dim);
-    line-height:1.6;
-    max-width:680px;
+    margin-top:16px; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--gold-dim);
+    border-radius:0 8px 8px 0; padding:12px 15px; font-size:12px; color:var(--ink-dim); line-height:1.6; max-width:680px;
   }
   .storage-note b{ color:var(--gold); }
 
+  .currency-box{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 14px;
+    min-width:200px;
+  }
+  .currency-select-wrap{ position:relative; }
+  .currency-select{
+    appearance:none; -webkit-appearance:none;
+    width:100%; background:var(--surface2); border:1px solid var(--line); border-radius:7px;
+    padding:8px 30px 8px 12px; color:var(--ink); font-family:'IBM Plex Mono',monospace; font-size:13px;
+    font-weight:600; cursor:pointer;
+  }
+  .currency-select:hover{ border-color:var(--gold-dim); }
+  .currency-select-wrap::after{
+    content:'▾'; position:absolute; right:11px; top:50%; transform:translateY(-50%);
+    color:var(--gold); pointer-events:none; font-size:11px;
+  }
+  .fx-line{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); margin-top:8px; display:flex; align-items:center; gap:5px; }
+  .fx-dot{ width:5px; height:5px; border-radius:50%; background:var(--profit); flex-shrink:0; }
+  .fx-dot.stale{ background:var(--ink-faint); }
+  .fx-dot.loading{ background:var(--gold); animation:pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
   main{ max-width:1080px; margin:0 auto; padding:0 20px; }
 
-  /* ---------- Summary statement ---------- */
   .statement{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:1px;
-    background:var(--line);
-    border:1px solid var(--line);
-    border-radius:10px;
-    overflow:hidden;
-    margin-top:28px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);
+    border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-top:28px;
   }
   @media(max-width:700px){ .statement{ grid-template-columns:repeat(2,1fr); } }
-  .stat-cell{
-    background:var(--surface);
-    padding:18px 16px;
-  }
-  .stat-label{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    color:var(--ink-faint);
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-  }
-  .stat-value{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:24px;
-    font-weight:600;
-    margin-top:6px;
-    font-variant-numeric:tabular-nums;
-  }
+  .stat-cell{ background:var(--surface); padding:18px 16px; }
+  .stat-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.06em; }
+  .stat-value{ font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; margin-top:6px; font-variant-numeric:tabular-nums; }
   .stat-value.profit{ color:var(--profit); }
   .stat-value.loss{ color:var(--loss); }
   .stat-sub{ font-size:11px; color:var(--ink-faint); margin-top:3px; }
 
-  /* ---------- Add transaction form ---------- */
-  .ledger-card{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:10px;
-    margin-top:24px;
-    overflow:hidden;
-  }
+  .ledger-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; margin-top:24px; overflow:hidden; }
   .ledger-head{
-    padding:16px 18px;
-    border-bottom:1px solid var(--line);
-    display:flex; align-items:center; justify-content:space-between;
-    cursor:pointer;
-    user-select:none;
+    padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; user-select:none;
   }
-  .ledger-title{
-    font-family:'Newsreader',serif;
-    font-size:18px;
-    font-weight:600;
-    display:flex; align-items:center; gap:8px;
-  }
+  .ledger-title{ font-family:'Newsreader',serif; font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
   .ledger-toggle{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    color:var(--gold);
-    border:1px solid var(--gold-dim);
-    padding:5px 12px;
-    border-radius:20px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold); border:1px solid var(--gold-dim);
+    padding:5px 12px; border-radius:20px;
   }
-  .ledger-body{ padding:18px; }
-  .ledger-body.collapsed{ display:none; }
-  .form-grid{
-    display:grid;
-    grid-template-columns:2fr 1fr 1.4fr;
-    gap:12px;
+  .ledger-body{
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .3s ease, padding .35s ease;
+    padding:0 18px;
   }
-  .form-grid2{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr 1fr;
-    gap:12px;
-    margin-top:12px;
-  }
+  .ledger-body.expanded{ max-height:900px; opacity:1; padding:18px; }
+  .form-grid{ display:grid; grid-template-columns:2fr 1fr 1.6fr; gap:12px; }
+  .form-grid2{ display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-top:12px; }
   @media(max-width:700px){ .form-grid, .form-grid2{ grid-template-columns:1fr 1fr; } }
-  .field-label{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    color:var(--ink-faint);
-    text-transform:uppercase;
-    letter-spacing:0.05em;
-    display:block;
-    margin-bottom:6px;
+  .field-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px; }
+  .field-input, .field-select{
+    width:100%; background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:10px 12px;
+    color:var(--ink); font-family:'Inter',sans-serif; font-size:14px;
   }
-  .field-input{
-    width:100%;
-    background:var(--surface2);
-    border:1px solid var(--line);
-    border-radius:7px;
-    padding:10px 12px;
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    font-size:14px;
-  }
+  .field-select{ appearance:none; -webkit-appearance:none; cursor:pointer; background-image:none; padding-right:28px; }
+  .field-select-wrap{ position:relative; }
+  .field-select-wrap::after{ content:'▾'; position:absolute; right:11px; top:38px; color:var(--gold); pointer-events:none; font-size:10px; }
   .field-input.mono{ font-family:'IBM Plex Mono',monospace; }
-  .field-input:focus{ outline:none; border-color:var(--gold-dim); }
+  .field-input:focus, .field-select:focus{ outline:none; border-color:var(--gold-dim); box-shadow:0 0 0 3px rgba(201,161,90,0.12); }
   .field-input::placeholder{ color:var(--ink-faint); }
-  .form-actions{
-    display:flex; align-items:center; gap:10px;
-    margin-top:16px;
-  }
+  .form-actions{ display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; }
   .btn-primary{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12.5px;
-    font-weight:600;
-    background:var(--gold);
-    color:#1a1305;
-    border:none;
-    padding:11px 20px;
-    border-radius:7px;
-    cursor:pointer;
-    transition:all .15s ease;
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; background:var(--gold); color:#1a1305;
+    border:none; padding:11px 20px; border-radius:7px; cursor:pointer;
   }
-  .btn-primary:hover{ background:#dcb46c; }
+  .btn-primary:hover{ background:#dcb46c; transform:translateY(-1px); }
+  .btn-primary:active{ transform:translateY(0); }
   .btn-secondary{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    background:var(--surface2);
-    color:var(--ink-dim);
-    border:1px solid var(--line);
-    padding:10px 16px;
-    border-radius:7px;
-    cursor:pointer;
-    transition:all .15s ease;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; background:var(--surface2); color:var(--ink-dim);
+    border:1px solid var(--line); padding:10px 16px; border-radius:7px; cursor:pointer;
   }
   .btn-secondary:hover{ border-color:var(--gold-dim); color:var(--ink); }
   .form-hint{ font-size:11.5px; color:var(--ink-faint); margin-top:4px; }
 
-  /* ---------- Filter bar ---------- */
-  .filter-bar{
-    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
-    margin-top:26px; margin-bottom:16px;
-  }
+  .filter-bar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:26px; margin-bottom:16px; }
   .search-wrap{ position:relative; flex:1; min-width:180px; }
   .search-wrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink-faint); }
-  .search-input{
-    width:100%;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:9px 12px 9px 34px;
-    color:var(--ink);
-    font-size:13.5px;
-  }
+  .search-input{ width:100%; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:9px 12px 9px 34px; color:var(--ink); font-size:13.5px; }
   .chip{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    padding:8px 13px;
-    border-radius:20px;
-    border:1px solid var(--line);
-    background:var(--surface);
-    color:var(--ink-dim);
-    cursor:pointer;
-    white-space:nowrap;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 13px; border-radius:20px; border:1px solid var(--line);
+    background:var(--surface); color:var(--ink-dim); cursor:pointer; white-space:nowrap;
   }
+  .chip:hover{ border-color:var(--gold-dim); }
   .chip.active{ background:var(--gold); border-color:var(--gold); color:#1a1305; font-weight:600; }
   .chip.active[data-filter="holding"]{ background:var(--ink-dim); border-color:var(--ink-dim); color:#0f1210; }
   .chip.active[data-filter="profit"]{ background:var(--profit); border-color:var(--profit); color:#0a1f10; }
   .chip.active[data-filter="loss"]{ background:var(--loss); border-color:var(--loss); color:#2a0f0b; }
   .export-btns{ display:flex; gap:6px; margin-left:auto; }
   .icon-btn{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    color:var(--ink-dim);
-    background:var(--surface);
-    border:1px solid var(--line);
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    display:inline-flex; align-items:center; gap:5px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-dim); background:var(--surface);
+    border:1px solid var(--line); padding:8px 12px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;
   }
   .icon-btn:hover{ border-color:var(--gold-dim); color:var(--gold); }
 
-  /* ---------- Transaction rows ---------- */
   .tx-list{ display:flex; flex-direction:column; gap:10px; }
   .tx-row{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:16px;
-    position:relative;
-    overflow:hidden;
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:12px;
-    align-items:start;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px; position:relative; overflow:hidden;
+    display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:start;
+    animation:rowIn .35s cubic-bezier(.4,0,.2,1);
   }
+  @keyframes rowIn{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
+  .tx-row:hover{ border-color:var(--gold-dim); }
+  .tx-thumb{
+    width:56px; height:78px; border-radius:6px; background:var(--surface2); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;
+  }
+  .tx-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .tx-thumb .ph{ font-size:9px; color:var(--ink-faint); text-align:center; font-family:'IBM Plex Mono',monospace; padding:2px; }
   .tx-main{ min-width:0; }
   .tx-name{ font-family:'Newsreader',serif; font-size:17px; font-weight:600; }
   .tx-meta{ font-size:12px; color:var(--ink-faint); margin-top:3px; }
-  .tx-prices{
-    display:flex; gap:20px; margin-top:10px;
-    font-family:'IBM Plex Mono',monospace;
-  }
+  .tx-prices{ display:flex; gap:20px; margin-top:10px; font-family:'IBM Plex Mono',monospace; flex-wrap:wrap; }
   .tx-price-block .lbl{ font-size:9px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; }
   .tx-price-block .val{ font-size:15px; font-weight:600; margin-top:2px; }
   .tx-dates{ font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:'IBM Plex Mono',monospace; }
   .status-pill{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    font-weight:600;
-    padding:4px 10px;
-    border-radius:20px;
-    text-transform:uppercase;
-    letter-spacing:0.04em;
-    display:inline-block;
-    margin-top:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600; padding:4px 10px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:0.04em; display:inline-block; margin-top:8px;
   }
   .status-pill.holding{ background:rgba(147,154,143,0.15); color:var(--ink-dim); border:1px solid var(--line); }
 
-  /* ---------- Stamp signature element ---------- */
   .stamp{
-    position:absolute;
-    top:14px; right:16px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:13px;
-    font-weight:700;
-    letter-spacing:0.04em;
-    padding:8px 14px;
-    border:2.5px solid;
-    border-radius:6px;
-    transform:rotate(4deg);
-    text-transform:uppercase;
-    white-space:nowrap;
-    opacity:0.92;
+    position:absolute; top:14px; right:16px; font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:700;
+    letter-spacing:0.04em; padding:8px 14px; border:2.5px solid; border-radius:6px; transform:rotate(4deg);
+    text-transform:uppercase; white-space:nowrap; opacity:0.92;
   }
   .stamp.profit{ color:var(--profit); border-color:var(--profit); }
   .stamp.loss{ color:var(--loss); border-color:var(--loss); transform:rotate(-3deg); }
-  .stamp::before{
-    content:'';
-    position:absolute; inset:2px;
-    border:1px solid currentColor;
-    border-radius:4px;
-    opacity:0.4;
-  }
+  .stamp::before{ content:''; position:absolute; inset:2px; border:1px solid currentColor; border-radius:4px; opacity:0.4; }
   .tx-actions{ display:flex; gap:6px; flex-shrink:0; }
   .tx-actions button{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10.5px;
-    background:var(--surface2);
-    color:var(--ink-faint);
-    border:1px solid var(--line);
-    padding:6px 10px;
-    border-radius:6px;
-    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; background:var(--surface2); color:var(--ink-faint);
+    border:1px solid var(--line); padding:6px 10px; border-radius:6px; cursor:pointer;
   }
   .tx-actions button:hover{ color:var(--ink); border-color:var(--gold-dim); }
   .tx-actions button.danger:hover{ color:var(--loss); border-color:var(--loss-dim); }
 
-  .empty-state{
-    text-align:center; padding:60px 20px;
-    color:var(--ink-faint); font-size:13px;
-  }
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--ink-faint); font-size:13px; }
   .empty-state .big{ font-family:'Newsreader',serif; font-size:20px; color:var(--ink-dim); margin-bottom:8px; font-style:italic; }
 
+  #toastWrap{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:100; display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .toast{
+    background:var(--surface3); border:1px solid var(--gold-dim); color:var(--ink); font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px; padding:11px 20px; border-radius:24px; box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    display:flex; align-items:center; gap:8px;
+    animation:toastIn .3s cubic-bezier(.4,0,.2,1), toastOut .3s ease 2.2s forwards;
+  }
+  .toast .dot{ width:6px; height:6px; border-radius:50%; background:var(--profit); }
+  .toast.danger .dot{ background:var(--loss); }
+  .toast.danger{ border-color:var(--loss-dim); }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(-6px); } }
+
   footer{
-    max-width:1080px; margin:50px auto 0; padding:20px;
-    border-top:1px solid var(--line);
+    max-width:1080px; margin:50px auto 0; padding:20px; border-top:1px solid var(--line);
     font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); line-height:1.7;
   }
 </style>
@@ -354,11 +211,25 @@
 <body>
 
 <header>
-  <div class="eyebrow">Flip Log · personal P&amp;L ledger</div>
-  <h1>Every flip, <em>booked</em>.</h1>
-  <p class="sub">Log what you paid, what you sold it for, and watch your real capital and P&amp;L add up — no market data, no opinions, just your own numbers.</p>
+  <div class="header-top">
+    <div>
+      <div class="eyebrow">Flip Log · personal P&amp;L ledger</div>
+      <h1>Every flip, <em>booked</em>.</h1>
+      <p class="sub">Log what you paid, what you sold it for, and watch your real capital and P&amp;L add up — no market data, no opinions, just your own numbers.</p>
+    </div>
+    <div class="currency-box">
+      <label class="field-label">Display currency</label>
+      <div class="currency-select-wrap">
+        <select class="currency-select" id="currencySelect" onchange="setCurrency(this.value)">
+          <option value="USD">USD — US Dollar ($)</option>
+          <option value="PHP">PHP — Philippine Peso (₱)</option>
+        </select>
+      </div>
+      <div class="fx-line" id="fxLine"><span class="fx-dot loading"></span><span id="fxLineText">Fetching live rate…</span></div>
+    </div>
+  </div>
   <div class="storage-note">
-    <b>Where this data lives:</b> everything you enter is saved in this browser only (localStorage), on this device. It is not synced anywhere and clearing your browser data will erase it. Use <b>Export</b> regularly to save a backup file you can re-<b>Import</b> later or on another device.
+    <b>Where this data lives:</b> everything you enter is saved in this browser only (localStorage), on this device. It is not synced anywhere and clearing your browser data will erase it. Use <b>Export</b> regularly to save a backup file. <b>Amounts are always entered and stored in USD</b> — the PHP view is a live converted display only.
   </div>
 </header>
 
@@ -371,7 +242,7 @@
       <div class="ledger-title">📗 Log a transaction</div>
       <div class="ledger-toggle" id="ledgerToggle">+ New entry</div>
     </div>
-    <div class="ledger-body collapsed" id="ledgerBody">
+    <div class="ledger-body" id="ledgerBody">
       <div class="form-grid">
         <div>
           <label class="field-label">Card name</label>
@@ -381,14 +252,14 @@
           <label class="field-label">Number</label>
           <input class="field-input mono" id="fNum" placeholder="161/131">
         </div>
-        <div>
-          <label class="field-label">Set</label>
-          <input class="field-input" id="fSet" placeholder="Prismatic Evolutions">
+        <div class="field-select-wrap">
+          <label class="field-label">Set / Promo</label>
+          <select class="field-select" id="fSet"></select>
         </div>
       </div>
       <div class="form-grid2">
         <div>
-          <label class="field-label">Buy price</label>
+          <label class="field-label">Buy price (USD)</label>
           <input class="field-input mono" id="fBuy" type="number" step="0.01" placeholder="0.00">
         </div>
         <div>
@@ -396,7 +267,7 @@
           <input class="field-input mono" id="fBuyDate" type="date">
         </div>
         <div>
-          <label class="field-label">Sell price <span style="color:var(--ink-faint);">(optional)</span></label>
+          <label class="field-label">Sell price (USD) <span style="color:var(--ink-faint);">(optional)</span></label>
           <input class="field-input mono" id="fSell" type="number" step="0.01" placeholder="0.00">
         </div>
         <div>
@@ -404,7 +275,7 @@
           <input class="field-input mono" id="fSellDate" type="date">
         </div>
       </div>
-      <p class="form-hint">Leave sell price blank if you're still holding — it'll show as "Holding" until you close it out.</p>
+      <p class="form-hint">Leave sell price blank if you're still holding. Prices are entered in USD regardless of display currency — switch the dropdown above any time to view in PHP.</p>
       <div class="form-actions">
         <button class="btn-primary" onclick="saveTransaction()">Save entry</button>
         <button class="btn-secondary" onclick="resetForm()">Clear</button>
@@ -434,38 +305,101 @@
 </main>
 
 <footer>
-  FLIP LOG — a personal calculator, not financial advice. All figures are exactly what you enter; nothing here is verified against live market prices. Data stored locally in your browser via localStorage.
+  FLIP LOG — a personal calculator, not financial advice. All figures are exactly what you enter; nothing here is verified against live market prices. Card images via the public PokemonTCG.io API, matched by name/number/set — may occasionally miss or mismatch for very new or obscure cards. FX rate via a public currency-data API, refreshed periodically. Data stored locally in your browser via localStorage.
 </footer>
+
+<div id="toastWrap"></div>
 
 <script>
   const STORAGE_KEY = 'fliplog_transactions_v1';
+  const FX_CACHE_KEY = 'fliplog_fx_cache_v1';
+  const IMG_CACHE_KEY = 'fliplog_img_cache_v1';
   let activeFilter = 'all';
   let editingId = null;
+  let displayCurrency = localStorage.getItem('fliplog_currency_v1') || 'USD';
+  let fxRate = null;
+
+  document.getElementById('currencySelect').value = displayCurrency;
 
   function loadTx(){
+    try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveTx(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+
+  function fmtMoney(usdAmount){
+    const sign = usdAmount < 0 ? '-' : '';
+    const abs = Math.abs(usdAmount);
+    if(displayCurrency === 'PHP' && fxRate){
+      const php = abs * fxRate;
+      return sign + '₱' + php.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+    return sign + '$' + abs.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function showToast(msg, danger){
+    const wrap = document.getElementById('toastWrap');
+    const t = document.createElement('div');
+    t.className = 'toast' + (danger ? ' danger' : '');
+    t.innerHTML = '<span class="dot"></span><span>' + msg + '</span>';
+    wrap.appendChild(t);
+    setTimeout(() => t.remove(), 2600);
+  }
+
+  async function fetchFxRate(){
+    const cached = JSON.parse(localStorage.getItem(FX_CACHE_KEY) || 'null');
+    const now = Date.now();
+    if(cached && (now - cached.ts) < 6 * 60 * 60 * 1000){
+      fxRate = cached.rate;
+      updateFxLine('cached', cached.ts);
+      render();
+      return;
+    }
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch(e) { return []; }
+      const res = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+      if(!res.ok) throw new Error('fx fetch failed');
+      const data = await res.json();
+      const rate = data.usd.php;
+      if(!rate) throw new Error('no php rate in response');
+      fxRate = rate;
+      localStorage.setItem(FX_CACHE_KEY, JSON.stringify({rate, ts: now}));
+      updateFxLine('live', now);
+    } catch(e) {
+      if(cached){ fxRate = cached.rate; updateFxLine('stale', cached.ts); }
+      else { updateFxLine('error', now); }
+    }
+    render();
   }
-  function saveTx(list){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+  function updateFxLine(status, ts){
+    const dot = document.querySelector('#fxLine .fx-dot');
+    const text = document.getElementById('fxLineText');
+    dot.className = 'fx-dot' + (status === 'stale' || status === 'error' ? ' stale' : '');
+    const mins = Math.round((Date.now() - ts) / 60000);
+    const ago = mins < 1 ? 'just now' : (mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago');
+    if(status === 'live') text.textContent = '₱' + fxRate.toFixed(2) + ' per $1 · updated ' + ago;
+    else if(status === 'cached') text.textContent = '₱' + fxRate.toFixed(2) + ' per $1 · cached ' + ago;
+    else if(status === 'stale') text.textContent = '₱' + fxRate.toFixed(2) + ' per $1 · offline, last known ' + ago;
+    else text.textContent = 'Rate unavailable — showing USD only';
   }
-  function fmtUSD(n){
-    const sign = n < 0 ? '-' : '';
-    return sign + '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  function setCurrency(val){
+    displayCurrency = val;
+    localStorage.setItem('fliplog_currency_v1', val);
+    render();
   }
 
   function toggleLedger(){
     const body = document.getElementById('ledgerBody');
     const toggle = document.getElementById('ledgerToggle');
-    const collapsed = body.classList.toggle('collapsed');
-    toggle.textContent = collapsed ? '+ New entry' : '– Collapse';
+    const expanded = body.classList.toggle('expanded');
+    toggle.textContent = expanded ? '– Collapse' : '+ New entry';
   }
   document.getElementById('ledgerHead').addEventListener('click', toggleLedger);
 
   function resetForm(){
-    ['fName','fNum','fSet','fBuy','fBuyDate','fSell','fSellDate'].forEach(id => document.getElementById(id).value = '');
+    ['fName','fNum','fBuy','fBuyDate','fSell','fSellDate'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fSet').value = '';
     editingId = null;
     document.getElementById('editingNote').style.display = 'none';
   }
@@ -473,17 +407,14 @@
   function saveTransaction(){
     const name = document.getElementById('fName').value.trim();
     const num = document.getElementById('fNum').value.trim();
-    const set = document.getElementById('fSet').value.trim();
+    const set = document.getElementById('fSet').value;
     const buy = parseFloat(document.getElementById('fBuy').value);
     const buyDate = document.getElementById('fBuyDate').value;
     const sellRaw = document.getElementById('fSell').value;
     const sell = sellRaw === '' ? null : parseFloat(sellRaw);
     const sellDate = document.getElementById('fSellDate').value;
 
-    if(!name || isNaN(buy)){
-      alert('Card name and buy price are required.');
-      return;
-    }
+    if(!name || isNaN(buy)){ showToast('Card name and buy price are required.', true); return; }
 
     const list = loadTx();
     const entry = { id: editingId || (Date.now() + '-' + Math.random().toString(36).slice(2,7)), name, num, set, buy, buyDate, sell, sellDate };
@@ -491,13 +422,12 @@
     if(editingId){
       const idx = list.findIndex(t => t.id === editingId);
       if(idx !== -1) list[idx] = entry;
-    } else {
-      list.push(entry);
-    }
+    } else { list.push(entry); }
     saveTx(list);
     resetForm();
-    document.getElementById('ledgerBody').classList.add('collapsed');
+    document.getElementById('ledgerBody').classList.remove('expanded');
     document.getElementById('ledgerToggle').textContent = '+ New entry';
+    showToast(editingId ? 'Entry updated' : 'Entry saved');
     render();
   }
 
@@ -514,7 +444,7 @@
     document.getElementById('fSellDate').value = t.sellDate || '';
     editingId = id;
     document.getElementById('editingNote').style.display = 'inline';
-    document.getElementById('ledgerBody').classList.remove('collapsed');
+    document.getElementById('ledgerBody').classList.add('expanded');
     document.getElementById('ledgerToggle').textContent = '– Collapse';
     window.scrollTo({top: document.querySelector('.ledger-card').offsetTop - 20, behavior:'smooth'});
   }
@@ -523,6 +453,7 @@
     if(!confirm('Delete this entry? This cannot be undone.')) return;
     const list = loadTx().filter(t => t.id !== id);
     saveTx(list);
+    showToast('Entry deleted', true);
     render();
   }
 
@@ -542,6 +473,7 @@
     a.download = 'fliplog-backup-' + new Date().toISOString().slice(0,10) + '.json';
     a.click();
     URL.revokeObjectURL(url);
+    showToast('Backup downloaded');
   }
 
   function importData(event){
@@ -557,10 +489,8 @@
         const merged = existing.concat(imported.filter(t => !existingIds.has(t.id)));
         saveTx(merged);
         render();
-        alert('Imported ' + imported.length + ' entries (duplicates skipped).');
-      } catch(err) {
-        alert('Could not read that file — make sure it is a Flip Log export.');
-      }
+        showToast('Imported ' + imported.length + ' entries');
+      } catch(err) { showToast('Could not read that file — make sure it is a Flip Log export.', true); }
       event.target.value = '';
     };
     reader.readAsText(file);
@@ -574,10 +504,7 @@
         const pl = t.sell - t.buy;
         realizedPL += pl;
         if(pl >= 0) wins++; else losses++;
-      } else {
-        holdingCount++;
-        holdingCapital += t.buy;
-      }
+      } else { holdingCount++; holdingCapital += t.buy; }
     });
     const closedCount = wins + losses;
     const winRate = closedCount > 0 ? Math.round((wins / closedCount) * 100) : null;
@@ -588,45 +515,65 @@
     const s = computeSummary(list);
     const plClass = s.realizedPL > 0 ? 'profit' : (s.realizedPL < 0 ? 'loss' : '');
     document.getElementById('statementGrid').innerHTML = `
-      <div class="stat-cell">
-        <div class="stat-label">Total Capital Deployed</div>
-        <div class="stat-value">${fmtUSD(s.capitalDeployed)}</div>
-        <div class="stat-sub">${list.length} total entries</div>
-      </div>
-      <div class="stat-cell">
-        <div class="stat-label">Realized P&amp;L</div>
-        <div class="stat-value ${plClass}">${fmtUSD(s.realizedPL)}</div>
-        <div class="stat-sub">${s.closedCount} closed trades</div>
-      </div>
-      <div class="stat-cell">
-        <div class="stat-label">Win Rate</div>
-        <div class="stat-value">${s.winRate === null ? '—' : s.winRate + '%'}</div>
-        <div class="stat-sub">${s.winRate === null ? 'no closed trades yet' : 'of closed trades'}</div>
-      </div>
-      <div class="stat-cell">
-        <div class="stat-label">Currently Holding</div>
-        <div class="stat-value">${s.holdingCount}</div>
-        <div class="stat-sub">${fmtUSD(s.holdingCapital)} tied up</div>
-      </div>
+      <div class="stat-cell"><div class="stat-label">Total Capital Deployed</div><div class="stat-value">${fmtMoney(s.capitalDeployed)}</div><div class="stat-sub">${list.length} total entries</div></div>
+      <div class="stat-cell"><div class="stat-label">Realized P&amp;L</div><div class="stat-value ${plClass}">${fmtMoney(s.realizedPL)}</div><div class="stat-sub">${s.closedCount} closed trades</div></div>
+      <div class="stat-cell"><div class="stat-label">Win Rate</div><div class="stat-value">${s.winRate === null ? '—' : s.winRate + '%'}</div><div class="stat-sub">${s.winRate === null ? 'no closed trades yet' : 'of closed trades'}</div></div>
+      <div class="stat-cell"><div class="stat-label">Currently Holding</div><div class="stat-value">${s.holdingCount}</div><div class="stat-sub">${fmtMoney(s.holdingCapital)} tied up</div></div>
     `;
+  }
+
+  function getImgCache(){ try { return JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || '{}'); } catch(e){ return {}; } }
+  function setImgCache(cache){ localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(cache)); }
+
+  async function fetchCardImage(entryId, name, num){
+    const cache = getImgCache();
+    const cacheKey = (name + '|' + (num||'')).toLowerCase();
+    if(cache[cacheKey] !== undefined){ applyImage(entryId, cache[cacheKey]); return; }
+    try {
+      const query = encodeURIComponent('name:"' + name + '"');
+      const res = await fetch('https://api.pokemontcg.io/v2/cards?q=' + query + '&pageSize=10');
+      if(!res.ok) throw new Error('img fetch failed');
+      const data = await res.json();
+      let match = null;
+      if(data.data && data.data.length){
+        if(num){
+          const numerator = num.split('/')[0];
+          match = data.data.find(c => c.number === numerator) || data.data[0];
+        } else { match = data.data[0]; }
+      }
+      const url = match ? match.images.small : null;
+      cache[cacheKey] = url;
+      setImgCache(cache);
+      applyImage(entryId, url);
+    } catch(e) {
+      cache[cacheKey] = null;
+      setImgCache(cache);
+    }
+  }
+
+  function applyImage(entryId, url){
+    if(!url) return;
+    const thumb = document.querySelector('.tx-thumb[data-id="' + entryId + '"]');
+    if(thumb) thumb.innerHTML = '<img src="' + url + '" alt="" loading="lazy">';
   }
 
   function txCardHTML(t){
     const hasSell = t.sell !== null && t.sell !== undefined && !isNaN(t.sell);
     const pl = hasSell ? t.sell - t.buy : null;
     const stampHTML = hasSell
-      ? `<div class="stamp ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : '-'}${fmtUSD(Math.abs(pl)).replace('$','$')} ${pl >= 0 ? 'PROFIT' : 'LOSS'}</div>`
+      ? `<div class="stamp ${pl >= 0 ? 'profit' : 'loss'}">${pl >= 0 ? '+' : '-'}${fmtMoney(Math.abs(pl))} ${pl >= 0 ? 'PROFIT' : 'LOSS'}</div>`
       : '';
     const metaParts = [t.set, t.num].filter(Boolean).join(' · ');
     return `
       <div class="tx-row">
         ${stampHTML}
+        <div class="tx-thumb" data-id="${t.id}"><span class="ph">no image</span></div>
         <div class="tx-main">
           <div class="tx-name">${escapeHTML(t.name)}</div>
           ${metaParts ? `<div class="tx-meta">${escapeHTML(metaParts)}</div>` : ''}
           <div class="tx-prices">
-            <div class="tx-price-block"><div class="lbl">Bought</div><div class="val">${fmtUSD(t.buy)}</div></div>
-            ${hasSell ? `<div class="tx-price-block"><div class="lbl">Sold</div><div class="val">${fmtUSD(t.sell)}</div></div>` : ''}
+            <div class="tx-price-block"><div class="lbl">Bought</div><div class="val">${fmtMoney(t.buy)}</div></div>
+            ${hasSell ? `<div class="tx-price-block"><div class="lbl">Sold</div><div class="val">${fmtMoney(t.sell)}</div></div>` : ''}
           </div>
           ${!hasSell ? '<div class="status-pill holding">Holding</div>' : ''}
           <div class="tx-dates">${t.buyDate ? 'Bought ' + t.buyDate : ''}${hasSell && t.sellDate ? '  ·  Sold ' + t.sellDate : ''}</div>
@@ -639,11 +586,7 @@
     `;
   }
 
-  function escapeHTML(s){
-    const div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
+  function escapeHTML(s){ const div = document.createElement('div'); div.textContent = s; return div.innerHTML; }
 
   function render(){
     const list = loadTx();
@@ -659,8 +602,7 @@
       if(q && !((t.name+' '+(t.set||'')).toLowerCase().includes(q))) return false;
       return true;
     });
-
-    filtered = filtered.slice().reverse(); // newest first
+    filtered = filtered.slice().reverse();
 
     const listEl = document.getElementById('txList');
     if(filtered.length === 0){
@@ -668,9 +610,42 @@
       return;
     }
     listEl.innerHTML = filtered.map(txCardHTML).join('');
+    filtered.forEach(t => fetchCardImage(t.id, t.name, t.num));
   }
 
   render();
+  fetchFxRate();
+</script>
+
+<script>
+  const SET_GROUPS = [
+    { era: "Mega Evolution Era (2026–)", sets: ["Mega Evolution: Ascended Heroes","Phantasmal Flames","Pitch Black","Delta Reign"] },
+    { era: "Scarlet & Violet Era (2023–2025)", sets: ["Scarlet & Violet","Paldea Evolved","Obsidian Flames","151","Paradox Rift","Paldean Fates","Temporal Forces","Twilight Masquerade","Shrouded Fable","Stellar Crown","Surging Sparks","Prismatic Evolutions","Journey Together","Destined Rivals","Black Bolt","White Flare"] },
+    { era: "Sword & Shield Era (2020–2022)", sets: ["Sword & Shield","Rebel Clash","Darkness Ablaze","Champion's Path","Vivid Voltage","Shining Fates","Battle Styles","Chilling Reign","Evolving Skies","Celebrations","Fusion Strike","Brilliant Stars","Astral Radiance","Pokémon GO","Lost Origin","Silver Tempest","Crown Zenith"] },
+    { era: "Sun & Moon Era (2017–2019)", sets: ["Sun & Moon","Guardians Rising","Burning Shadows","Shining Legends","Crimson Invasion","Ultra Prism","Forbidden Light","Celestial Storm","Dragon Majesty","Lost Thunder","Team Up","Detective Pikachu","Unbroken Bonds","Unified Minds","Hidden Fates","Cosmic Eclipse"] },
+    { era: "XY Era (2014–2016)", sets: ["XY","Flashfire","Furious Fists","Phantom Forces","Primal Clash","Roaring Skies","Ancient Origins","BREAKthrough","BREAKpoint","Generations","Fates Collide","Steam Siege","Evolutions"] },
+    { era: "Black & White Era (2011–2013)", sets: ["Black & White","Emerging Powers","Noble Victories","Next Destinies","Dark Explorers","Dragons Exalted","Boundaries Crossed","Plasma Storm","Plasma Freeze","Plasma Blast","Legendary Treasures"] },
+    { era: "HeartGold & SoulSilver Era (2010)", sets: ["HeartGold & SoulSilver","Unleashed","Undaunted","Triumphant","Call of Legends"] },
+    { era: "Platinum Era (2009)", sets: ["Platinum","Rising Rivals","Supreme Victors","Arceus"] },
+    { era: "Diamond & Pearl Era (2007–2009)", sets: ["Diamond & Pearl","Mysterious Treasures","Secret Wonders","Great Encounters","Majestic Dawn","Legends Awakened","Stormfront"] },
+    { era: "EX Era (2003–2007)", sets: ["EX Ruby & Sapphire","EX Sandstorm","EX Dragon","EX Team Magma vs Team Aqua","EX Hidden Legends","EX FireRed & LeafGreen","EX Team Rocket Returns","EX Deoxys","EX Emerald","EX Unseen Forces","EX Delta Species","EX Legend Maker","EX Holon Phantoms","EX Crystal Guardians","EX Dragon Frontiers","EX Power Keepers"] },
+    { era: "e-Card Era (2002–2003)", sets: ["Expedition Base Set","Aquapolis","Skyridge"] },
+    { era: "Neo Era (2000–2002)", sets: ["Neo Genesis","Neo Discovery","Neo Revelation","Neo Destiny","Legendary Collection"] },
+    { era: "Base Era (1999–2000)", sets: ["Base Set","Jungle","Fossil","Base Set 2","Team Rocket","Gym Heroes","Gym Challenge"] },
+    { era: "Promos & Special Releases", sets: ["Wizards Black Star Promos","POP Series (1–9)","Diamond & Pearl Black Star Promos","HGSS Black Star Promos","Black & White Black Star Promos","XY Black Star Promos","Sun & Moon Black Star Promos","SWSH Black Star Promos","Scarlet & Violet Black Star Promos","McDonald's Collection","Pokémon Center Exclusive","Build & Battle Box Promo","25th Anniversary Promo","30th Anniversary Promo","Southern Islands","Best of Game","World Championship Deck","Other / Not Listed"] },
+  ];
+
+  function populateSetDropdown(){
+    const sel = document.getElementById('fSet');
+    let html = '<option value="">Select a set or promo…</option>';
+    SET_GROUPS.forEach(group => {
+      html += `<optgroup label="${group.era}">`;
+      group.sets.forEach(s => { html += `<option value="${s}">${s}</option>`; });
+      html += `</optgroup>`;
+    });
+    sel.innerHTML = html;
+  }
+  populateSetDropdown();
 </script>
 
 </body>
