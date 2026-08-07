@@ -446,9 +446,11 @@
   let acDebounce = null;
   let acResults = [];
   let selectedApiCardId = null;
+  let selectedApiProvider = null;
 
   function onNameInput(){
     selectedApiCardId = null; // typing manually invalidates any prior exact match
+    selectedApiProvider = null;
     const q = document.getElementById('fName').value.trim();
     const statusEl = document.getElementById('autocompleteStatus');
     statusEl.className = 'autocomplete-status';
@@ -458,22 +460,80 @@
     acDebounce = setTimeout(() => searchCards(q), 350);
   }
 
+  // ---------- Two independent card data sources, normalized to one shape ----------
+  // TCGdex has proven far more reliable in testing (100% success vs frequent 500s
+  // on PokemonTCG.io), so it's tried first; PokemonTCG.io is kept as a genuine
+  // second source rather than dropped, since the two databases don't perfectly
+  // overlap and either can be down independently.
+  function normalizeTcgdex(raw){
+    return { id: raw.id, provider: 'tcgdex', name: raw.name, number: raw.localId, setName: null, imageUrl: raw.image ? raw.image + '/low.webp' : null };
+  }
+  function normalizePokemonTcg(raw){
+    return { id: raw.id, provider: 'pokemontcg', name: raw.name, number: raw.number, setName: raw.set ? raw.set.name : null, setTotal: raw.set ? raw.set.total : null, imageUrl: raw.images ? raw.images.small : null };
+  }
+
+  async function searchTcgdex(q){
+    const res = await fetch('https://api.tcgdex.net/v2/en/cards?name=' + encodeURIComponent(q));
+    if(!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
+    return (data || []).map(normalizeTcgdex);
+  }
+
+  // Builds a query using ONLY the pattern proven reliable against PokemonTCG.io:
+  // one quoted, suffix-wildcarded clause per word, space-joined (implicit AND).
+  // Wrapping a multi-word phrase in a single quoted wildcard (e.g. name:"*a b*")
+  // reliably 500s on their API — this avoids that entirely.
+  function buildWordQuery(words){
+    return words.map(w => 'name:"' + w.replace(/"/g,'') + '*"').join(' ');
+  }
+  async function searchPokemonTcg(queryStr, pageSize){
+    const query = encodeURIComponent(queryStr);
+    const res = await fetch('https://api.pokemontcg.io/v2/cards?q=' + query + '&pageSize=' + pageSize + '&orderBy=-set.releaseDate');
+    if(!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
+    return (data.data || []).map(normalizePokemonTcg);
+  }
+
+  async function withRetry(fn, retries){
+    for(let i = 0; i <= retries; i++){
+      try { return await fn(); }
+      catch(e){ if(i === retries) throw e; await new Promise(r => setTimeout(r, 400)); }
+    }
+  }
+
   async function searchCards(q){
     const statusEl = document.getElementById('autocompleteStatus');
-    statusEl.textContent = 'Searching PokemonTCG.io…';
+    statusEl.textContent = 'Searching…';
+    const words = q.trim().split(/\s+/).filter(Boolean);
+    if(!words.length) return;
+
+    // 1) TCGdex full phrase — proven most reliable, tried first.
     try {
-      const query = encodeURIComponent('name:"*' + q + '*"');
-      const res = await fetch('https://api.pokemontcg.io/v2/cards?q=' + query + '&pageSize=8&orderBy=-set.releaseDate');
-      if(!res.ok) throw new Error('search failed');
-      const data = await res.json();
-      acResults = data.data || [];
-      renderAutocomplete();
-      statusEl.textContent = acResults.length ? '' : 'No exact matches — you can still enter this card manually.';
-    } catch(e) {
-      acResults = [];
-      closeAutocomplete();
-      statusEl.textContent = 'Search unavailable right now — enter the card manually.';
+      const results = await withRetry(() => searchTcgdex(q.trim()), 1);
+      if(results.length){ acResults = results; renderAutocomplete(); statusEl.textContent = ''; return; }
+    } catch(e) { /* fall through */ }
+
+    // 2) PokemonTCG.io full phrase (AND-per-word, the safe pattern).
+    try {
+      const results = await withRetry(() => searchPokemonTcg(buildWordQuery(words), 10), 1);
+      if(results.length){ acResults = results; renderAutocomplete(); statusEl.textContent = ''; return; }
+    } catch(e) { /* fall through */ }
+
+    // 3) Widen: first word only, TCGdex then PokemonTCG.io.
+    if(words.length > 1){
+      try {
+        const results = await withRetry(() => searchTcgdex(words[0]), 1);
+        if(results.length){ acResults = results; renderAutocomplete(); statusEl.textContent = 'Showing broader matches for "' + words[0] + '"'; return; }
+      } catch(e) { /* fall through */ }
+      try {
+        const results = await withRetry(() => searchPokemonTcg(buildWordQuery([words[0]]), 10), 1);
+        if(results.length){ acResults = results; renderAutocomplete(); statusEl.textContent = 'Showing broader matches for "' + words[0] + '"'; return; }
+      } catch(e) { /* fall through */ }
     }
+
+    acResults = [];
+    closeAutocomplete();
+    statusEl.textContent = 'No matches found — you can still enter this card manually.';
   }
 
   function renderAutocomplete(){
@@ -481,10 +541,10 @@
     if(!acResults.length){ closeAutocomplete(); return; }
     list.innerHTML = acResults.map((c, i) => `
       <div class="ac-item" data-idx="${i}" onclick="selectAutocomplete(${i})">
-        <div class="ac-thumb">${c.images && c.images.small ? `<img src="${c.images.small}" alt="" loading="lazy">` : ''}</div>
+        <div class="ac-thumb">${c.imageUrl ? `<img src="${c.imageUrl}" alt="" loading="lazy">` : ''}</div>
         <div>
           <div class="ac-name">${escapeHTML(c.name)}</div>
-          <div class="ac-meta">${escapeHTML(c.set ? c.set.name : '')} · ${escapeHTML(c.number || '')}${c.set && c.set.total ? '/' + c.set.total : ''}</div>
+          <div class="ac-meta">${escapeHTML(c.setName || c.provider)} · ${escapeHTML(c.number || '')}${c.setTotal ? '/' + c.setTotal : ''}</div>
         </div>
       </div>
     `).join('');
@@ -495,21 +555,35 @@
     document.getElementById('autocompleteList').classList.remove('open');
   }
 
-  function selectAutocomplete(idx){
+  async function selectAutocomplete(idx){
     const c = acResults[idx];
     if(!c) return;
     document.getElementById('fName').value = c.name;
-    document.getElementById('fNum').value = c.number + (c.set && c.set.total ? '/' + c.set.total : '');
     selectedApiCardId = c.id;
-    // best-effort match against our own Set/Promo dropdown; not required to match
-    const setSel = document.getElementById('fSet');
-    const apiSetName = c.set ? c.set.name : '';
-    const opt = Array.from(setSel.options).find(o => o.value.toLowerCase() === apiSetName.toLowerCase());
-    if(opt) setSel.value = opt.value;
-    closeAutocomplete();
+    selectedApiProvider = c.provider;
     const statusEl = document.getElementById('autocompleteStatus');
+    closeAutocomplete();
+
+    let setName = c.setName, setTotal = c.setTotal, number = c.number;
+    // TCGdex's search results don't include the set name — fetch it once,
+    // only for the card actually picked (not for every result while typing).
+    if(c.provider === 'tcgdex' && !setName){
+      try {
+        const res = await fetch('https://api.tcgdex.net/v2/en/cards/' + c.id);
+        if(res.ok){
+          const d = await res.json();
+          setName = d.set ? d.set.name : null;
+          setTotal = d.set && d.set.cardCount ? d.set.cardCount.official : null;
+        }
+      } catch(e) { /* leave setName null, user can pick manually */ }
+    }
+    document.getElementById('fNum').value = number + (setTotal ? '/' + setTotal : '');
+
+    const setSel = document.getElementById('fSet');
+    const opt = setName ? Array.from(setSel.options).find(o => o.value.toLowerCase() === setName.toLowerCase()) : null;
+    if(opt) setSel.value = opt.value;
     statusEl.className = 'autocomplete-status matched';
-    statusEl.textContent = '✓ Exact card matched — image will be precise.' + (opt ? '' : ' (Set not in our list — please pick the closest match above.)');
+    statusEl.textContent = '✓ Exact card matched (' + c.provider + ') — image will be precise.' + (opt ? '' : ' (Set not in our list — please pick the closest match above.)');
   }
 
   document.addEventListener('click', (e) => {
@@ -521,6 +595,7 @@
     document.getElementById('fSet').value = '';
     editingId = null;
     selectedApiCardId = null;
+    selectedApiProvider = null;
     document.getElementById('editingNote').style.display = 'none';
     document.getElementById('autocompleteStatus').textContent = '';
     document.getElementById('autocompleteStatus').className = 'autocomplete-status';
@@ -549,7 +624,8 @@
     const entry = {
       id: editingId || (Date.now() + '-' + Math.random().toString(36).slice(2,7)),
       name, num, set, buy, buyDate, sell, sellDate,
-      apiCardId: selectedApiCardId || (existing ? existing.apiCardId : null) || null
+      apiCardId: selectedApiCardId || (existing ? existing.apiCardId : null) || null,
+      apiProvider: selectedApiProvider || (existing ? existing.apiProvider : null) || null
     };
 
     if(editingId){
@@ -577,6 +653,7 @@
     document.getElementById('fSellDate').value = t.sellDate || '';
     editingId = id;
     selectedApiCardId = t.apiCardId || null;
+    selectedApiProvider = t.apiProvider || null;
     document.getElementById('editingNote').style.display = 'inline';
     document.getElementById('ledgerBody').classList.add('expanded');
     document.getElementById('ledgerToggle').textContent = '– Collapse';
@@ -659,49 +736,79 @@
   function getImgCache(){ try { return JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || '{}'); } catch(e){ return {}; } }
   function setImgCache(cache){ localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(cache)); }
 
-  async function fetchCardImage(entryId, name, num, apiCardId){
+  async function fetchWithRetry(url, retries){
+    for(let i = 0; i <= retries; i++){
+      try {
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('status ' + res.status);
+        return await res.json();
+      } catch(e) {
+        if(i === retries) throw e;
+        await new Promise(r => setTimeout(r, 400));
+      }
+    }
+  }
+
+  async function fetchCardImage(entryId, name, num, apiCardId, setName, apiProvider){
     const cache = getImgCache();
-    // If this entry was matched via autocomplete, we have the card's exact ID —
-    // fetch it directly instead of re-guessing by name/number (this is what
-    // makes the picture exact rather than a best-effort fuzzy match).
-    if(apiCardId){
-      const idCacheKey = 'id:' + apiCardId;
+    // If this entry was matched via autocomplete, we know exactly which card
+    // and which provider it came from — fetch that provider's record directly
+    // instead of re-guessing by name/number.
+    if(apiCardId && apiProvider){
+      const idCacheKey = apiProvider + ':id:' + apiCardId;
       if(cache[idCacheKey] !== undefined){ applyImage(entryId, cache[idCacheKey]); return; }
       try {
-        const res = await fetch('https://api.pokemontcg.io/v2/cards/' + apiCardId);
-        if(!res.ok) throw new Error('exact id fetch failed');
-        const data = await res.json();
-        const url = data.data ? data.data.images.small : null;
+        let url = null;
+        if(apiProvider === 'tcgdex'){
+          const data = await fetchWithRetry('https://api.tcgdex.net/v2/en/cards/' + apiCardId, 1);
+          url = data.image ? data.image + '/low.webp' : null;
+        } else {
+          const data = await fetchWithRetry('https://api.pokemontcg.io/v2/cards/' + apiCardId, 1);
+          url = data.data ? data.data.images.small : null;
+        }
         cache[idCacheKey] = url;
         setImgCache(cache);
         applyImage(entryId, url);
         return;
       } catch(e) {
-        // fall through to fuzzy search below if the exact ID lookup fails
+        // fall through to fuzzy search below if the exact lookup fails
       }
     }
+
     const cacheKey = (name + '|' + (num||'')).toLowerCase();
     if(cache[cacheKey] !== undefined){ applyImage(entryId, cache[cacheKey]); return; }
+
+    // Fuzzy fallback, tried across both providers in turn.
+    let url = null;
     try {
-      const query = encodeURIComponent('name:"' + name + '"');
-      const res = await fetch('https://api.pokemontcg.io/v2/cards?q=' + query + '&pageSize=10');
-      if(!res.ok) throw new Error('img fetch failed');
-      const data = await res.json();
-      let match = null;
-      if(data.data && data.data.length){
-        if(num){
-          const numerator = num.split('/')[0];
-          match = data.data.find(c => c.number === numerator) || data.data[0];
-        } else { match = data.data[0]; }
-      }
-      const url = match ? match.images.small : null;
-      cache[cacheKey] = url;
-      setImgCache(cache);
-      applyImage(entryId, url);
-    } catch(e) {
-      cache[cacheKey] = null;
-      setImgCache(cache);
+      const results = await fetchWithRetry('https://api.tcgdex.net/v2/en/cards?name=' + encodeURIComponent(name), 1);
+      const numerator = num ? num.split('/')[0].replace(/^0+/, '') : null;
+      const match = (numerator && results.find(c => (c.localId||'').replace(/^0+/, '') === numerator)) || results[0];
+      if(match && match.image) url = match.image + '/low.webp';
+    } catch(e) { /* try next provider */ }
+
+    if(!url){
+      try {
+        const query = encodeURIComponent('name:"' + name.replace(/"/g,'') + '"');
+        const data = await fetchWithRetry('https://api.pokemontcg.io/v2/cards?q=' + query + '&pageSize=15', 1);
+        if(data.data && data.data.length){
+          const numerator = num ? num.split('/')[0] : null;
+          // Widened matching: prefer a result that matches BOTH the card number
+          // AND the set name (when we have both), so "the specific card" is
+          // picked correctly even when several prints share the same name/number
+          // across different sets — falls back progressively if not available.
+          const match = (numerator && setName && data.data.find(c => c.number === numerator && c.set && c.set.name && c.set.name.toLowerCase() === setName.toLowerCase()))
+            || (numerator && data.data.find(c => c.number === numerator))
+            || (setName && data.data.find(c => c.set && c.set.name && c.set.name.toLowerCase() === setName.toLowerCase()))
+            || data.data[0];
+          if(match) url = match.images.small;
+        }
+      } catch(e) { /* both providers failed — leave url null, shows "no image" */ }
     }
+
+    cache[cacheKey] = url;
+    setImgCache(cache);
+    applyImage(entryId, url);
   }
 
   function applyImage(entryId, url){
@@ -763,7 +870,7 @@
       return;
     }
     listEl.innerHTML = filtered.map(txCardHTML).join('');
-    filtered.forEach(t => fetchCardImage(t.id, t.name, t.num, t.apiCardId));
+    filtered.forEach(t => fetchCardImage(t.id, t.name, t.num, t.apiCardId, t.set, t.apiProvider));
   }
 
   render();
