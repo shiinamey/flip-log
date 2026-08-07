@@ -219,7 +219,7 @@
   .toast .dot{ width:6px; height:6px; border-radius:50%; background:var(--profit); }
   .toast.danger .dot{ background:var(--loss); }
   .toast.danger{ border-color:var(--loss-dim); }
-  @keyframes toastIn{ from{ opacity:0; transform:translateY(10px); } tn{ opacity:1; transform:translateY(0); } }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
   @keyframes toastOut{ to{ opacity:0; transform:translateY(-6px); } }
 
   footer{
