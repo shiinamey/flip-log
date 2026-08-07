@@ -100,74 +100,7 @@
   @media(max-width:700px){ .form-grid, .form-grid2{ grid-template-columns:1fr 1fr; } }
   .field-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px; }
   .field-input, .field-select{
-    width:100%; background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:10px 12px;
-    color:var(--ink); font-family:'Inter',sans-serif; font-size:14px;
-  }
-  .field-select{ appearance:none; -webkit-appearance:none; cursor:pointer; background-image:none; padding-right:28px; }
-  .field-select-wrap{ position:relative; }
-  .field-select-wrap::after{ content:'▾'; position:absolute; right:11px; top:38px; color:var(--gold); pointer-events:none; font-size:10px; }
-  .field-input.mono{ font-family:'IBM Plex Mono',monospace; }
-  .field-input:focus, .field-select:focus{ outline:none; border-color:var(--gold-dim); box-shadow:0 0 0 3px rgba(201,161,90,0.12); }
-  .field-input::placeholder{ color:var(--ink-faint); }
-  .form-actions{ display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; }
-  .btn-primary{
-    font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; background:var(--gold); color:#1a1305;
-    border:none; padding:11px 20px; border-radius:7px; cursor:pointer;
-  }
-  .btn-primary:hover{ background:#dcb46c; transform:translateY(-1px); }
-  .btn-primary:active{ transform:translateY(0); }
-  .btn-secondary{
-    font-family:'IBM Plex Mono',monospace; font-size:12px; background:var(--surface2); color:var(--ink-dim);
-    border:1px solid var(--line); padding:10px 16px; border-radius:7px; cursor:pointer;
-  }
-  .btn-secondary:hover{ border-color:var(--gold-dim); color:var(--ink); }
-  .form-hint{ font-size:11.5px; color:var(--ink-faint); margin-top:4px; }
-
-  .filter-bar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:26px; margin-bottom:16px; }
-  .search-wrap{ position:relative; flex:1; min-width:180px; }
-  .search-wrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink-faint); }
-  .search-input{ width:100%; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:9px 12px 9px 34px; color:var(--ink); font-size:13.5px; }
-  .chip{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 13px; border-radius:20px; border:1px solid var(--line);
-    background:var(--surface); color:var(--ink-dim); cursor:pointer; white-space:nowrap;
-  }
-  .chip:hover{ border-color:var(--gold-dim); }
-  .chip.active{ background:var(--gold); border-color:var(--gold); color:#1a1305; font-weight:600; }
-  .chip.active[data-filter="holding"]{ background:var(--ink-dim); border-color:var(--ink-dim); color:#0f1210; }
-  .chip.active[data-filter="profit"]{ background:var(--profit); border-color:var(--profit); color:#0a1f10; }
-  .chip.active[data-filter="loss"]{ background:var(--loss); border-color:var(--loss); color:#2a0f0b; }
-  .export-btns{ display:flex; gap:6px; margin-left:auto; }
-  .icon-btn{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-dim); background:var(--surface);
-    border:1px solid var(--line); padding:8px 12px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;
-  }
-  .icon-btn:hover{ border-color:var(--gold-dim); color:var(--gold); }
-
-  .tx-list{ display:flex; flex-direction:column; gap:10px; }
-  .tx-row{
-    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px; position:relative; overflow:hidden;
-    display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:start;
-    animation:rowIn .35s cubic-bezier(.4,0,.2,1);
-  }
-  @keyframes rowIn{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
-  .tx-row:hover{ border-color:var(--gold-dim); }
-  .tx-thumb{
-    width:56px; height:78px; border-radius:6px; background:var(--surface2); border:1px solid var(--line);
-    display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;
-  }
-  .tx-thumb img{ width:100%; height:100%; object-fit:cover; }
-  .tx-thumb .ph{ font-size:9px; color:var(--ink-faint); text-align:center; font-family:'IBM Plex Mono',monospace; padding:2px; }
-  .tx-main{ min-width:0; }
-  .tx-name{ font-family:'Newsreader',serif; font-size:17px; font-weight:600; }
-  .tx-meta{ font-size:12px; color:var(--ink-faint); margin-top:3px; }
-  .tx-prices{ display:flex; gap:20px; margin-top:10px; font-family:'IBM Plex Mono',monospace; flex-wrap:wrap; }
-  .tx-price-block .lbl{ font-size:9px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; }
-  .tx-price-block .val{ font-size:15px; font-weight:600; margin-top:2px; }
-  .tx-dates{ font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:'IBM Plex Mono',monospace; }
-  .status-pill{
-    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600; padding:4px 10px; border-radius:20px;
-    text-transform:uppercase; letter-spacing:0.04em; display:inline-block; margin-top:8px;
-  }
+    width:100%; background:var(--surface2); border:1px sol  }
   .status-pill.holding{ background:rgba(147,154,143,0.15); color:var(--ink-dim); border:1px solid var(--line); }
 
   .stamp{
@@ -229,7 +162,7 @@
     </div>
   </div>
   <div class="storage-note">
-    <b>Where this data lives:</b> everything you enter is saved in this browser only (localStorage), on this device. It is not synced anywhere and clearing your browser data will erase it. Use <b>Export</b> regularly to save a backup file. <b>Amounts are always entered and stored in USD</b> — the PHP view is a live converted display only.
+    <b>Where this data lives:</b> everything you enter is saved in this browser only (localStorage), on this device. It is not synced anywhere and clearing your browser data will erase it. Use <b>Export</b> regularly to save a backup file. <b>Enter prices in whichever currency is selected above</b> — they're converted to USD automatically for canonical storage, so switching the dropdown never changes your historical numbers.
   </div>
 </header>
 
@@ -244,9 +177,11 @@
     </div>
     <div class="ledger-body" id="ledgerBody">
       <div class="form-grid">
-        <div>
-          <label class="field-label">Card name</label>
-          <input class="field-input" id="fName" placeholder="e.g. Umbreon ex">
+        <div class="autocomplete-wrap">
+          <label class="field-label">Card name <span style="color:var(--ink-faint);">(search to match exact card + image)</span></label>
+          <input class="field-input" id="fName" placeholder="Start typing to search…" autocomplete="off" oninput="onNameInput()" onfocus="onNameInput()">
+          <div class="autocomplete-list" id="autocompleteList"></div>
+          <div class="autocomplete-status" id="autocompleteStatus"></div>
         </div>
         <div>
           <label class="field-label">Number</label>
@@ -259,7 +194,7 @@
       </div>
       <div class="form-grid2">
         <div>
-          <label class="field-label">Buy price (USD)</label>
+          <label class="field-label" id="fBuyLabel">Buy price (USD)</label>
           <input class="field-input mono" id="fBuy" type="number" step="0.01" placeholder="0.00">
         </div>
         <div>
@@ -267,7 +202,7 @@
           <input class="field-input mono" id="fBuyDate" type="date">
         </div>
         <div>
-          <label class="field-label">Sell price (USD) <span style="color:var(--ink-faint);">(optional)</span></label>
+          <label class="field-label" id="fSellLabel">Sell price (USD) <span style="color:var(--ink-faint);">(optional)</span></label>
           <input class="field-input mono" id="fSell" type="number" step="0.01" placeholder="0.00">
         </div>
         <div>
@@ -275,9 +210,120 @@
           <input class="field-input mono" id="fSellDate" type="date">
         </div>
       </div>
-      <p class="form-hint">Leave sell price blank if you're still holding. Prices are entered in USD regardless of display currency — switch the dropdown above any time to view in PHP.</p>
+      <p class="form-hint" id="formHint">Leave sell price blank if you're still holding.  }
+  .status-pill.holding{ background:rgba(147,154,143,0.15); color:var(--ink-dim); border:1px solid var(--line); }
+
+  .stamp{
+    position:absolute; top:14px; right:16px; font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:700;
+    letter-spacing:0.04em; padding:8px 14px; border:2.5px solid; border-radius:6px; transform:rotate(4deg);
+    text-transform:uppercase; white-space:nowrap; opacity:0.92;
+  }
+  .stamp.profit{ color:var(--profit); border-color:var(--profit); }
+  .stamp.loss{ color:var(--loss); border-color:var(--loss); transform:rotate(-3deg); }
+  .stamp::before{ content:''; position:absolute; inset:2px; border:1px solid currentColor; border-radius:4px; opacity:0.4; }
+  .tx-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .tx-actions button{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; background:var(--surface2); color:var(--ink-faint);
+    border:1px solid var(--line); padding:6px 10px; border-radius:6px; cursor:pointer;
+  }
+  .tx-actions button:hover{ color:var(--ink); border-color:var(--gold-dim); }
+  .tx-actions button.danger:hover{ color:var(--loss); border-color:var(--loss-dim); }
+
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--ink-faint); font-size:13px; }
+  .empty-state .big{ font-family:'Newsreader',serif; font-size:20px; color:var(--ink-dim); margin-bottom:8px; font-style:italic; }
+
+  #toastWrap{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:100; display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .toast{
+    background:var(--surface3); border:1px solid var(--gold-dim); color:var(--ink); font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px; padding:11px 20px; border-radius:24px; box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    display:flex; align-items:center; gap:8px;
+    animation:toastIn .3s cubic-bezier(.4,0,.2,1), toastOut .3s ease 2.2s forwards;
+  }
+  .toast .dot{ width:6px; height:6px; border-radius:50%; background:var(--profit); }
+  .toast.danger .dot{ background:var(--loss); }
+  .toast.danger{ border-color:var(--loss-dim); }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(-6px); } }
+
+  footer{
+    max-width:1080px; margin:50px auto 0; padding:20px; border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); line-height:1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="eyebrow">Flip Log · personal P&amp;L ledger</div>
+      <h1>Every flip, <em>booked</em>.</h1>
+      <p class="sub">Log what you paid, what you sold it for, and watch your real capital and P&amp;L add up — no market data, no opinions, just your own numbers.</p>
+    </div>
+    <div class="currency-box">
+      <label class="field-label">Display currency</label>
+      <div class="currency-select-wrap">
+        <select class="currency-select" id="currencySelect" onchange="setCurrency(this.value)">
+          <option value="USD">USD — US Dollar ($)</option>
+          <option value="PHP">PHP — Philippine Peso (₱)</option>
+        </select>
+      </div>
+      <div class="fx-line" id="fxLine"><span class="fx-dot loading"></span><span id="fxLineText">Fetching live rate…</span></div>
+    </div>
+  </div>
+  <div class="storage-note">
+    <b>Where this data lives:</b> everything you enter is saved in this browser only (localStorage), on this device. It is not synced anywhere and clearing your browser data will erase it. Use <b>Export</b> regularly to save a backup file. <b>Enter prices in whichever currency is selected above</b> — they're converted to USD automatically for canonical storage, so switching the dropdown never changes your historical numbers.
+  </div>
+</header>
+
+<main>
+
+  <div class="statement" id="statementGrid"></div>
+
+  <div class="ledger-card">
+    <div class="ledger-head" id="ledgerHead">
+      <div class="ledger-title">📗 Log a transaction</div>
+      <div class="ledger-toggle" id="ledgerToggle">+ New entry</div>
+    </div>
+    <div class="ledger-body" id="ledgerBody">
+      <div class="form-grid">
+        <div class="autocomplete-wrap">
+          <label class="field-label">Card name <span style="color:var(--ink-faint);">(search to match exact card + image)</span></label>
+          <input class="field-input" id="fName" placeholder="Start typing to search…" autocomplete="off" oninput="onNameInput()" onfocus="onNameInput()">
+          <div class="autocomplete-list" id="autocompleteList"></div>
+          <div class="autocomplete-status" id="autocompleteStatus"></div>
+        </div>
+        <div>
+          <label class="field-label">Number</label>
+          <input class="field-input mono" id="fNum" placeholder="161/131">
+        </div>
+        <div class="field-select-wrap">
+          <label class="field-label">Set / Promo</label>
+          <select class="field-select" id="fSet"></select>
+        </div>
+      </div>
+      <div class="form-grid2">
+        <div>
+          <label class="field-label" id="fBuyLabel">Buy price (USD)</label>
+          <input class="field-input mono" id="fBuy" type="number" step="0.01" placeholder="0.00">
+        </div>
+        <div>
+          <label class="field-label">Buy date</label>
+          <input class="field-input mono" id="fBuyDate" type="date">
+        </div>
+        <div>
+          <label class="field-label" id="fSellLabel">Sell price (USD) <span style="color:var(--ink-faint);">(optional)</span></label>
+          <input class="field-input mono" id="fSell" type="number" step="0.01" placeholder="0.00">
+        </div>
+        <div>
+          <label class="field-label">Sell date <span style="color:var(--ink-faint);">(optional)</span></label>
+          <input class="field-input mono" id="fSellDate" type="date">
+        </div>
+      </div>
+      <p class="form-hint" id="formHint">Leave sell price blank if you're still holding. Prices are entered in USD regardless of display currency — switch the dropdown above any time to view in PHP.</p>
       <div class="form-actions">
         <button class="btn-primary" onclick="saveTransaction()">Save entry</button>
+
         <button class="btn-secondary" onclick="resetForm()">Clear</button>
         <span id="editingNote" style="font-size:11.5px; color:var(--gold); display:none;">Editing existing entry — saving will update it.</span>
       </div>
@@ -381,11 +427,33 @@
     else if(status === 'cached') text.textContent = '₱' + fxRate.toFixed(2) + ' per $1 · cached ' + ago;
     else if(status === 'stale') text.textContent = '₱' + fxRate.toFixed(2) + ' per $1 · offline, last known ' + ago;
     else text.textContent = 'Rate unavailable — showing USD only';
+    updateFormLabels();
+  }
+
+  function updateFormLabels(){
+    const cur = displayCurrency === 'PHP' && fxRate ? 'PHP' : 'USD';
+    document.getElementById('fBuyLabel').innerHTML = 'Buy price (' + cur + ')';
+    document.getElementById('fSellLabel').innerHTML = 'Sell price (' + cur + ') <span style="color:var(--ink-faint);">(optional)</span>';
+    document.getElementById('formHint').textContent = cur === 'PHP'
+      ? "Leave sell price blank if you're still holding. Prices below are entered in PHP right now (converted to USD automatically for storage) — switch the dropdown above to enter in USD instead."
+      : "Leave sell price blank if you're still holding. Prices below are entered in USD right now — switch the dropdown above to enter in PHP instead.";
+  }
+
+  // Convert a value the user TYPED (in current display currency) into canonical USD for storage.
+  function toUSD(val){
+    if(displayCurrency === 'PHP' && fxRate) return val / fxRate;
+    return val;
+  }
+  // Convert a stored USD value into the current display currency, for showing in the edit form.
+  function fromUSDForForm(val){
+    if(displayCurrency === 'PHP' && fxRate) return +(val * fxRate).toFixed(2);
+    return val;
   }
 
   function setCurrency(val){
     displayCurrency = val;
     localStorage.setItem('fliplog_currency_v1', val);
+    updateFormLabels();
     render();
   }
 
@@ -397,27 +465,115 @@
   }
   document.getElementById('ledgerHead').addEventListener('click', toggleLedger);
 
+  /* ---------- Card name autocomplete (exact PokemonTCG.io match) ---------- */
+  let acDebounce = null;
+  let acResults = [];
+  let selectedApiCardId = null;
+
+  function onNameInput(){
+    selectedApiCardId = null; // typing manually invalidates any prior exact match
+    const q = document.getElementById('fName').value.trim();
+    const statusEl = document.getElementById('autocompleteStatus');
+    statusEl.className = 'autocomplete-status';
+    statusEl.textContent = '';
+    clearTimeout(acDebounce);
+    if(q.length < 3){ closeAutocomplete(); return; }
+    acDebounce = setTimeout(() => searchCards(q), 350);
+  }
+
+  async function searchCards(q){
+    const statusEl = document.getElementById('autocompleteStatus');
+    statusEl.textContent = 'Searching PokemonTCG.io…';
+    try {
+      const query = encodeURIComponent('name:"*' + q + '*"');
+      const res = await fetch('https://api.pokemontcg.io/v2/cards?q=' + query + '&pageSize=8&orderBy=-set.releaseDate');
+      if(!res.ok) throw new Error('search failed');
+      const data = await res.json();
+      acResults = data.data || [];
+      renderAutocomplete();
+      statusEl.textContent = acResults.length ? '' : 'No exact matches — you can still enter this card manually.';
+    } catch(e) {
+      acResults = [];
+      closeAutocomplete();
+      statusEl.textContent = 'Search unavailable right now — enter the card manually.';
+    }
+  }
+
+  function renderAutocomplete(){
+    const list = document.getElementById('autocompleteList');
+    if(!acResults.length){ closeAutocomplete(); return; }
+    list.innerHTML = acResults.map((c, i) => `
+      <div class="ac-item" data-idx="${i}" onclick="selectAutocomplete(${i})">
+        <div class="ac-thumb">${c.images && c.images.small ? `<img src="${c.images.small}" alt="" loading="lazy">` : ''}</div>
+        <div>
+          <div class="ac-name">${escapeHTML(c.name)}</div>
+          <div class="ac-meta">${escapeHTML(c.set ? c.set.name : '')} · ${escapeHTML(c.number || '')}${c.set && c.set.total ? '/' + c.set.total : ''}</div>
+        </div>
+      </div>
+    `).join('');
+    list.classList.add('open');
+  }
+
+  function closeAutocomplete(){
+    document.getElementById('autocompleteList').classList.remove('open');
+  }
+
+  function selectAutocomplete(idx){
+    const c = acResults[idx];
+    if(!c) return;
+    document.getElementById('fName').value = c.name;
+    document.getElementById('fNum').value = c.number + (c.set && c.set.total ? '/' + c.set.total : '');
+    selectedApiCardId = c.id;
+    // best-effort match against our own Set/Promo dropdown; not required to match
+    const setSel = document.getElementById('fSet');
+    const apiSetName = c.set ? c.set.name : '';
+    const opt = Array.from(setSel.options).find(o => o.value.toLowerCase() === apiSetName.toLowerCase());
+    if(opt) setSel.value = opt.value;
+    closeAutocomplete();
+    const statusEl = document.getElementById('autocompleteStatus');
+    statusEl.className = 'autocomplete-status matched';
+    statusEl.textContent = '✓ Exact card matched — image will be precise.' + (opt ? '' : ' (Set not in our list — please pick the closest match above.)');
+  }
+
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.autocomplete-wrap')) closeAutocomplete();
+  });
+
   function resetForm(){
     ['fName','fNum','fBuy','fBuyDate','fSell','fSellDate'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fSet').value = '';
     editingId = null;
+    selectedApiCardId = null;
     document.getElementById('editingNote').style.display = 'none';
+    document.getElementById('autocompleteStatus').textContent = '';
+    document.getElementById('autocompleteStatus').className = 'autocomplete-status';
+    closeAutocomplete();
   }
 
   function saveTransaction(){
     const name = document.getElementById('fName').value.trim();
     const num = document.getElementById('fNum').value.trim();
     const set = document.getElementById('fSet').value;
-    const buy = parseFloat(document.getElementById('fBuy').value);
+    const buyRaw = parseFloat(document.getElementById('fBuy').value);
     const buyDate = document.getElementById('fBuyDate').value;
-    const sellRaw = document.getElementById('fSell').value;
-    const sell = sellRaw === '' ? null : parseFloat(sellRaw);
+    const sellRawInput = document.getElementById('fSell').value;
+    const sellRaw = sellRawInput === '' ? null : parseFloat(sellRawInput);
     const sellDate = document.getElementById('fSellDate').value;
 
-    if(!name || isNaN(buy)){ showToast('Card name and buy price are required.', true); return; }
+    if(!name || isNaN(buyRaw)){ showToast('Card name and buy price are required.', true); return; }
+
+    // Whatever the user typed is in the CURRENTLY SELECTED display currency —
+    // convert to canonical USD before storing.
+    const buy = toUSD(buyRaw);
+    const sell = sellRaw === null ? null : toUSD(sellRaw);
 
     const list = loadTx();
-    const entry = { id: editingId || (Date.now() + '-' + Math.random().toString(36).slice(2,7)), name, num, set, buy, buyDate, sell, sellDate };
+    const existing = editingId ? list.find(t => t.id === editingId) : null;
+    const entry = {
+      id: editingId || (Date.now() + '-' + Math.random().toString(36).slice(2,7)),
+      name, num, set, buy, buyDate, sell, sellDate,
+      apiCardId: selectedApiCardId || (existing ? existing.apiCardId : null) || null
+    };
 
     if(editingId){
       const idx = list.findIndex(t => t.id === editingId);
@@ -438,11 +594,12 @@
     document.getElementById('fName').value = t.name;
     document.getElementById('fNum').value = t.num || '';
     document.getElementById('fSet').value = t.set || '';
-    document.getElementById('fBuy').value = t.buy;
+    document.getElementById('fBuy').value = fromUSDForForm(t.buy);
     document.getElementById('fBuyDate').value = t.buyDate || '';
-    document.getElementById('fSell').value = t.sell === null || t.sell === undefined ? '' : t.sell;
+    document.getElementById('fSell').value = (t.sell === null || t.sell === undefined) ? '' : fromUSDForForm(t.sell);
     document.getElementById('fSellDate').value = t.sellDate || '';
     editingId = id;
+    selectedApiCardId = t.apiCardId || null;
     document.getElementById('editingNote').style.display = 'inline';
     document.getElementById('ledgerBody').classList.add('expanded');
     document.getElementById('ledgerToggle').textContent = '– Collapse';
@@ -525,8 +682,27 @@
   function getImgCache(){ try { return JSON.parse(localStorage.getItem(IMG_CACHE_KEY) || '{}'); } catch(e){ return {}; } }
   function setImgCache(cache){ localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(cache)); }
 
-  async function fetchCardImage(entryId, name, num){
+  async function fetchCardImage(entryId, name, num, apiCardId){
     const cache = getImgCache();
+    // If this entry was matched via autocomplete, we have the card's exact ID —
+    // fetch it directly instead of re-guessing by name/number (this is what
+    // makes the picture exact rather than a best-effort fuzzy match).
+    if(apiCardId){
+      const idCacheKey = 'id:' + apiCardId;
+      if(cache[idCacheKey] !== undefined){ applyImage(entryId, cache[idCacheKey]); return; }
+      try {
+        const res = await fetch('https://api.pokemontcg.io/v2/cards/' + apiCardId);
+        if(!res.ok) throw new Error('exact id fetch failed');
+        const data = await res.json();
+        const url = data.data ? data.data.images.small : null;
+        cache[idCacheKey] = url;
+        setImgCache(cache);
+        applyImage(entryId, url);
+        return;
+      } catch(e) {
+        // fall through to fuzzy search below if the exact ID lookup fails
+      }
+    }
     const cacheKey = (name + '|' + (num||'')).toLowerCase();
     if(cache[cacheKey] !== undefined){ applyImage(entryId, cache[cacheKey]); return; }
     try {
@@ -610,10 +786,11 @@
       return;
     }
     listEl.innerHTML = filtered.map(txCardHTML).join('');
-    filtered.forEach(t => fetchCardImage(t.id, t.name, t.num));
+    filtered.forEach(t => fetchCardImage(t.id, t.name, t.num, t.apiCardId));
   }
 
   render();
+  updateFormLabels();
   fetchFxRate();
 </script>
 
